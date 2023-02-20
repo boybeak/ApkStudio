@@ -1,6 +1,6 @@
 package com.github.boybeak.apkstudio
 
-import com.github.boybeak.apkstudio.cmd.CmdExecutor
+import com.github.boybeak.apkstudio.cmd.Cmd
 import com.github.boybeak.apkstudio.cmd.CmdText
 import com.github.boybeak.apkstudio.cmd.Color
 import java.io.File
@@ -19,7 +19,7 @@ object ApkTool {
     }
 
     fun d(apkFile: File, outputDir: File, onMessage: (line: String) -> Unit, onError: (line: String) -> Unit): Boolean {
-        return CmdExecutor.command("apktool d ${apkFile.absolutePath} -o ${outputDir.absolutePath}")
+        return Cmd.command("apktool d ${apkFile.absolutePath} -o ${outputDir.absolutePath}")
             .onStart(onStartCallback)
             .onMessage(onMessage)
             .onError(onError)
@@ -28,7 +28,7 @@ object ApkTool {
     }
 
     fun b(dir: File, outputApk: File, onMessage: (line: String) -> Unit, onError: (line: String) -> Unit): Boolean {
-        return CmdExecutor.command("apktool b ${dir.absolutePath} -o ${outputApk.absolutePath}")
+        return Cmd.command("apktool b ${dir.absolutePath} -o ${outputApk.absolutePath}")
             .onStart(onStartCallback)
             .onMessage(onMessage)
             .onError(onError)
