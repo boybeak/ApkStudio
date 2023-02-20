@@ -1,5 +1,6 @@
 package com.github.boybeak.apkstudio
 
+import com.github.boybeak.apkstudio.cmd.Cmd
 import java.io.File
 
 val apkFile = File("/Users/GaoYunfei/ApkWorkspace/CloudSchoolTeacher-京师美育-release.apk")
@@ -11,7 +12,12 @@ private val signKeyFile = File("/Users/GaoYunfei/ApkWorkspace/sign_key.jks")
 
 fun main(vararg args: String) {
 
-    Env.check(
+    println(System.currentTimeMillis())
+    Cmd.simpleCmd("sleep 3").execute()
+    Cmd.simpleCmd("echo Hello").execute()
+    println(System.currentTimeMillis())
+
+    /*Env.check(
         onSuccess = { env ->
             env.sdk.buildTools.firstOrNull()?.run {
 //                zipalign.align()
@@ -20,7 +26,7 @@ fun main(vararg args: String) {
         }, onError = {
 
         }
-    )
+    )*/
 
 //    Zipalign().align(apkIn, apkAligned)
 //    ApkSigner().sign(apkAligned, apkOut,

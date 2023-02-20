@@ -1,5 +1,7 @@
 package com.github.boybeak.apkstudio.cmd
 
+import java.text.DecimalFormat
+
 class Cmd private constructor(val command: String){
     companion object {
         fun command(command: String): Cmd {
@@ -7,7 +9,7 @@ class Cmd private constructor(val command: String){
         }
         fun simpleCmd(command: String): Cmd {
             val onStartCallback: (cmd: String) -> Unit = {
-                println(CmdText(it).textColor(Color.GREEN))
+                println(CmdText("[$it]").textColor(Color.CYAN))
             }
             val onMessage: (line: String) -> Unit = {
                 println(CmdText(it))
@@ -15,12 +17,14 @@ class Cmd private constructor(val command: String){
             val onError: (line: String) -> Unit = {
                 println(CmdText.error(it))
             }
-            val onEndCallback: (success: Boolean) -> Unit = {
+            val onEndCallback: (cmd: String, success: Boolean, cost: Long) -> Unit = { cmd, success, cost ->
+                val formatter = DecimalFormat("0.00")
+                val cmdSimplify = if (cmd.length > 20) "${cmd.substringBeforeLast(' ')} ... ${cmd.substringAfterLast(' ')}" else cmd
                 println(
-                    if (it) {
-                        CmdText("Success").textColor(Color.GREEN)
+                    if (success) {
+                        CmdText("Success(${formatter.format(cost / 1000F)}s) - [${cmdSimplify}]\n").textColor(Color.GREEN)
                     } else {
-                        CmdText.error("Fail")
+                        CmdText.error("Fail(${formatter.format(cost / 1000F)}s) - [${cmdSimplify}]\n")
                     }
                 )
             }
@@ -35,7 +39,7 @@ class Cmd private constructor(val command: String){
     private var startCallback: ((command: String) -> Unit)? = null
     private var messageCallback: ((line: String) -> Unit)? = null
     private var errorCallback: ((line: String) -> Unit)? = null
-    private var endCallback: ((end: Boolean) -> Unit)? = null
+    private var endCallback: ((cmd: String, success: Boolean, cost: Long) -> Unit)? = null
 
     fun onStart(callback: (command: String) -> Unit): Cmd {
         this.startCallback = callback
@@ -49,12 +53,15 @@ class Cmd private constructor(val command: String){
         errorCallback = callback
         return this
     }
-    fun onEnd(callback: (success: Boolean) -> Unit): Cmd {
+    fun onEnd(callback: (cmd: String, success: Boolean, cost: Long) -> Unit): Cmd {
         this.endCallback = callback
         return this
     }
     fun execute(): Boolean {
         startCallback?.invoke(command)
+
+        val startAt = System.currentTimeMillis()
+
         val process = Runtime.getRuntime().exec(command)
 
         var messageStr: String?
@@ -75,7 +82,7 @@ class Cmd private constructor(val command: String){
             }
         } while (errorStr != null)
 
-        endCallback?.invoke(success)
+        endCallback?.invoke(command, success, System.currentTimeMillis() - startAt)
 
         startCallback = null
         messageCallback = null

@@ -6,13 +6,6 @@ import java.io.File
 object ApkStudio {
     private val workspaceRoot = File("/Users/GaoYunfei/ApkWorkspace")
 
-    private val onMessage: (line: String) -> Unit = {
-        println(CmdText(it))
-    }
-    private val onError: (line: String) -> Unit = {
-        println(CmdText.error(it))
-    }
-
     init {
 
     }
@@ -35,7 +28,7 @@ object ApkStudio {
         stringsReplaceFile.copyTo(stringsFile, true)
 
         val outputApkFile = File(workspaceRoot, "rebuild.apk")
-        ApkTool.b(output, outputApkFile, onMessage, onError)
+        ApkTool.b(output, outputApkFile)
 
         /*val signedApkFile = File(workspaceRoot, "signed.apk")
         ApkSigner().sign(outputApkFile, signedApkFile)*/
